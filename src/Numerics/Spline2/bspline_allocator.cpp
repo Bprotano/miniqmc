@@ -34,7 +34,7 @@ UBspline_3d_s *einspline_create_UBspline_3d_s(Ugrid x_grid, Ugrid y_grid,
 multi_UBspline_3d_d *
 einspline_create_multi_UBspline_3d_d(Ugrid x_grid, Ugrid y_grid, Ugrid z_grid,
                                      BCtype_d xBC, BCtype_d yBC, BCtype_d zBC,
-                                     int num_splines, std::string fileName);
+                                     int num_splines, std::string& fileName, int memThreshold);
 //DEBUG END DUPE ***************************************************************
 /*
 multi_UBspline_3d_d *
@@ -68,10 +68,10 @@ multi_UBspline_3d_s *Allocator::allocateMultiBspline(Ugrid x_grid, Ugrid y_grid,
 multi_UBspline_3d_d *Allocator::allocateMultiBspline(Ugrid x_grid, Ugrid y_grid,
                                                      Ugrid z_grid, BCtype_d xBC,
                                                      BCtype_d yBC, BCtype_d zBC,
-                                                     int num_splines, std::string fileName)
+                                                     int num_splines, std::string& fileName, int memThreshold)
 {
   return einspline_create_multi_UBspline_3d_d(x_grid, y_grid, z_grid, xBC, yBC,
-                                              zBC, num_splines, fileName);
+                                              zBC, num_splines, fileName, memThreshold);
 }
 //DEBUG END DUPE ***************************************************************
 /*
@@ -98,25 +98,13 @@ UBspline_3d_s *Allocator::allocateUBspline(Ugrid x_grid, Ugrid y_grid,
   return einspline_create_UBspline_3d_s(x_grid, y_grid, z_grid, xBC, yBC, zBC);
 }
 
-void Allocator::countMemory(multi_UBspline_3d_d *spline, std::string& fileName, bool& afterFirstRun)
+void Allocator::storeSpline(multi_UBspline_3d_d *spline, std::string& fileName)
 {
   SplineInfo currSpline;
-
-  if(afterFirstRun)
-  {
-    currSpline.size = spline->coefs_size;
-    currSpline.fileName = fileName;
-    currSpline.ptr = spline;
-    splines.push_back(currSpline);
-  }
-  else
-  {
-    if((sizeof(double) * spline->coefs_size) > MemoryThreshold && MemoryThreshold != 0)
-      destroy(spline, "");
-    else
-      fileName = "";
-    afterFirstRun = true;
-  }
+  currSpline.size = spline->coefs_size;
+  currSpline.fileName = fileName;
+  currSpline.ptr = spline;
+  splines.push_back(currSpline);
 }
 }
 }

@@ -227,7 +227,7 @@ einspline_create_multi_UBspline_3d_s(Ugrid x_grid, Ugrid y_grid, Ugrid z_grid,
 multi_UBspline_3d_d *
 einspline_create_multi_UBspline_3d_d(Ugrid x_grid, Ugrid y_grid, Ugrid z_grid,
                                      BCtype_d xBC, BCtype_d yBC, BCtype_d zBC,
-                                     int num_splines, std::string fileName)
+                                     int num_splines, std::string& fileName, int memThreshold)
 {
   // Create new spline
   multi_UBspline_3d_d *restrict spline = (multi_UBspline_3d_d *)malloc(sizeof(multi_UBspline_3d_d));
@@ -284,6 +284,8 @@ einspline_create_multi_UBspline_3d_d(Ugrid x_grid, Ugrid y_grid, Ugrid z_grid,
   spline->z_stride = N;
 
   spline->coefs_size = (size_t)Nx * spline->x_stride;
+  if(spline->coefs_size < memThreshold || memThreshold == 0)
+    fileName = "";
   spline->coefs =
       (double *)einspline_alloc(sizeof(double) * spline->coefs_size, QMC_CLINE, fileName);
 

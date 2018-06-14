@@ -92,7 +92,7 @@ public:
   multi_UBspline_3d_d *allocateMultiBspline(Ugrid x_grid, Ugrid y_grid,
                                             Ugrid z_grid, BCtype_d xBC,
                                             BCtype_d yBC, BCtype_d zBC,
-                                            int num_splines, std::string fileName);
+                                            int num_splines, std::string& fileName, int memThreshold);
 //END DEBUG DUPE **********************************************************
 /*
   /// allocate a double multi-bspline
@@ -155,7 +155,7 @@ public:
 
   /** checka the memory
   */
-  void countMemory(multi_UBspline_3d_d *spline, std::string& fileName, bool& afterFirstRun);
+  void storeSpline(multi_UBspline_3d_d *spline, std::string& fileName);
 
 };
 
@@ -180,7 +180,6 @@ typename bspline_traits<T, 3>::SplineType *
 Allocator::createMultiBspline(T dummy, ValT &start, ValT &end, IntT &ng,
                               bc_code bc, int num_splines, std::string fileName)
 {
-  bool afterFirstRun = false;
   multi_UBspline_3d_d * spline;
   Ugrid x_grid, y_grid, z_grid;
   typename bspline_traits<T, 3>::BCType xBC, yBC, zBC;
@@ -196,13 +195,8 @@ Allocator::createMultiBspline(T dummy, ValT &start, ValT &end, IntT &ng,
   xBC.lCode = xBC.rCode = bc;
   yBC.lCode = yBC.rCode = bc;
   zBC.lCode = zBC.rCode = bc;
-  spline = allocateMultiBspline(x_grid, y_grid, z_grid, xBC, yBC, zBC, num_splines, "");
-  countMemory(spline, fileName, afterFirstRun);
-  if(fileName != "")
-  {
-    spline = allocateMultiBspline(x_grid, y_grid, z_grid, xBC, yBC, zBC, num_splines, fileName);
-  }
-  countMemory(spline, fileName, afterFirstRun); 
+  spline = allocateMultiBspline(x_grid, y_grid, z_grid, xBC, yBC, zBC, num_splines, fileName, MemoryThreshold);
+  storeSpline(spline, fileName); 
   return spline;
 }
 //END DEBUG DUPE ***********************************************************
