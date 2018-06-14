@@ -98,30 +98,25 @@ UBspline_3d_s *Allocator::allocateUBspline(Ugrid x_grid, Ugrid y_grid,
   return einspline_create_UBspline_3d_s(x_grid, y_grid, z_grid, xBC, yBC, zBC);
 }
 
-bool Allocator::countMemory(multi_UBspline_3d_d *spline, std::string& fileName)
+void Allocator::countMemory(multi_UBspline_3d_d *spline, std::string& fileName, bool& afterFirstRun)
 {
-  bool flag = false;
+  SplineInfo currSpline;
 
-  if ((sizeof(double) * spline->coefs_size) > MemoryThreshold && MemoryThreshold != 0)
+  if(afterFirstRun)
   {
-    destroy(spline, "");
-    flag = true;
+    currSpline.size = spline->coefs_size;
+    currSpline.fileName = fileName;
+    currSpline.ptr = spline;
+    splines.push_back(currSpline);
   }
   else
   {
-    fileName = "";
+    if((sizeof(double) * spline->coefs_size) > MemoryThreshold && MemoryThreshold != 0)
+      destroy(spline, "");
+    else
+      fileName = "";
+    afterFirstRun = true;
   }
-
-  return flag;
-}
-
-void Allocator::storeSpline(multi_UBspline_3d_d *spline, const std::string& fileName)
-{
-  SplineInfo currSpline;
-  currSpline.size = spline->coefs_size;
-  currSpline.fileName = fileName;
-  currSpline.ptr = spline;
-  splines.push_back(currSpline);
 }
 }
 }
